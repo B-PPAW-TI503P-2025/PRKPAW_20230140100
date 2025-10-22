@@ -1,30 +1,28 @@
-// Import library Express dan CORS
-const express = require('express');
-const cors = require('cors');
-
-// Inisialisasi aplikasi
+const express = require("express");
+const cors = require("cors");
 const app = express();
-const port = 5000;
+const PORT = 3001;
+const morgan = require("morgan");
+
+// Impor router
+const presensiRoutes = require("./routes/presensi");
+const reportRoutes = require("./routes/reports");
 
 // Middleware
 app.use(cors());
 app.use(express.json());
-
-// ✅ Endpoint GET sesuai instruksi tugas
-app.get('/', (req, res) => {
-  res.json({ message: 'Hello from Server!' });
+app.use(morgan("dev"));
+app.use((req, res, next) => {
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+  next();
 });
-
-// ✅ Tambahan endpoint POST untuk tugas React agar menerima input nama
-app.post('/hello', (req, res) => {
-  const { name } = req.body;
-  if (!name) {
-    return res.status(400).json({ message: 'Nama belum dikirim.' });
-  }
-  res.json({ message: `Hello, ${name}!` });
+app.get("/", (req, res) => {
+  res.send("Home Page for API");
 });
-
-// Jalankan server
-app.listen(port, () => {
-  console.log(`Server running on http://localhost:${port}`);
+const ruteBuku = require("./routes/books");
+app.use("/api/books", ruteBuku);
+app.use("/api/presensi", presensiRoutes);
+app.use("/api/reports", reportRoutes);
+app.listen(PORT, () => {
+  console.log(`Express server running at http://localhost:${PORT}/`);
 });
