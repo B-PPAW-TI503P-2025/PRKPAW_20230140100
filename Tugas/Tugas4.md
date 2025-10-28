@@ -1,7 +1,7 @@
 ENDPOINT CHECK-IN
-![alt text](<Screenshot 2025-10-28 160138.png>)
+![alt text](<ss/Screenshot 2025-10-28 160138.png>)
 ENDPOINT CHECK-OUT
-![alt text](<Screenshot 2025-10-28 160149.png>)
+![alt text](<ss/Screenshot 2025-10-28 160149.png>)
 ENDPOINT REPORTS
 ![alt text](<ss/Screenshot 2025-10-28 160205.png>)
 TABEL DATABASE MYSQL
