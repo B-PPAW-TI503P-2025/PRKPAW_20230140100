@@ -3,6 +3,7 @@ const cors = require("cors");
 const app = express();
 const PORT = 3001;
 const morgan = require("morgan");
+const helmet = require("helmet");
 
 // Impor router
 const presensiRoutes = require("./routes/presensi");
@@ -10,6 +11,7 @@ const reportRoutes = require("./routes/reports");
 
 // Middleware
 app.use(cors());
+app.use(helmet());
 app.use(express.json());
 app.use(morgan("dev"));
 app.use((req, res, next) => {
@@ -17,7 +19,7 @@ app.use((req, res, next) => {
   next();
 });
 app.get("/", (req, res) => {
-  res.send("Home Page for API");
+  res.send("Home Page for API");exi
 });
 const ruteBuku = require("./routes/books");
 app.use("/api/books", ruteBuku);
