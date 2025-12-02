@@ -9,3 +9,6 @@ Check-out pada web
 
 Laporan 
 ![alt text](<ss/Screenshot 2025-12-02 083557.png>)
+
+Table Database
+![alt text](<ss/Screenshot 2025-12-02 084237.png>)
