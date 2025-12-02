@@ -1,6 +1,8 @@
-const express = require('express');
-const router = express.Router();
- 	const reportController = require('../controllers/reportController');
- 	const { addUserData, isAdmin } = require('../middleware/permissionMiddleware');
- 	router.get('/daily', [addUserData, isAdmin], reportController.getDailyReport);
- 	module.exports = router;
+const router = require('express').Router();
+const reportController = require('../controllers/reportcontroller'); 
+const { authenticateToken, isAdmin } = require('../middleware/permissionMiddleware'); 
+
+// GET /api/reports/daily
+router.get('/daily', authenticateToken, isAdmin, reportController.getDailyReports);
+
+module.exports = router;

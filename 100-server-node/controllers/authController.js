@@ -1,7 +1,7 @@
 const { User } = require('../models');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');	
-const JWT_SECRET = 'INI_ADALAH_KUNCI_RAHASIA_ANDA_YANG_SANGAT_AMAN';
+const JWT_SECRET = process.env.JWT_SECRET;
 
 exports.register = async (req, res) => {
   try {
@@ -67,6 +67,7 @@ exports.login = async (req, res) => {
     });
 
   } catch (error) {
-    res.status(500).json({ message: "Terjadi kesalahan pada server", error: error.message });
+    console.error("LOGIN ERROR:", error);
+    res.status(500).json({ message: "Terjadi kesalahan pada server" });
   }
 };
