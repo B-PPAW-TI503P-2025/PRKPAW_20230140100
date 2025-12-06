@@ -1,5 +1,22 @@
+'use strict';
+const { Model } = require('sequelize');
+
 module.exports = (sequelize, DataTypes) => {
-  const Presensi = sequelize.define('Presensi', {
+  class Presensi extends Model {
+    static associate(models) {
+      // HAPUS bagian "as: 'user'" di sini
+      Presensi.belongsTo(models.User, {
+        foreignKey: "userId",
+        // as: "user", <--- PENYEBAB MASALAH (Sudah saya hapus)
+      });
+    }
+  }
+  
+  Presensi.init({
+    userId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
     checkIn: {
       type: DataTypes.DATE,
       allowNull: false,
@@ -8,13 +25,22 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.DATE,
       allowNull: true,
     },
-  }, {});
-
-  Presensi.associate = function(models) {
-    Presensi.belongsTo(models.User, {
-      foreignKey: 'userId', 
-      as: 'User', 
-    });
-  };
+    latitude: {
+        type: DataTypes.DECIMAL(10, 7),
+        allowNull: false,
+    },
+    longitude: {
+        type: DataTypes.DECIMAL(10, 7),
+        allowNull: false,
+    },
+    buktiFoto: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    }
+  }, {
+    sequelize,
+    modelName: 'Presensi',
+  });
+  
   return Presensi;
 };
