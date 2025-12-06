@@ -11,6 +11,12 @@ function ReportPage() {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
 
+  // 1. STATE BARU UNTUK POPUP FOTO
+  const [selectedImage, setSelectedImage] = useState(null);
+
+  // URL Backend (Pastikan portnya benar, di kode Anda port 3001)
+  const BASE_URL = "http://localhost:3001"; 
+
   const getToken = () => localStorage.getItem("token");
 
   const fetchReports = async (query = "", start = "", end = "") => {
@@ -27,13 +33,13 @@ function ReportPage() {
       };
 
       setError(null); 
-      const response = await axios.get("http://localhost:3001/api/reports/daily", config);
+      const response = await axios.get(`${BASE_URL}/api/reports/daily`, config);
       setReports(response.data.data); 
 
     } catch (err) { 
       const message = err.response 
-                     ? err.response.data.message || `Gagal mengambil laporan: ${err.response.status}`
-                     : "Koneksi ke server gagal. Pastikan server berjalan dan Anda login sebagai admin.";
+                      ? err.response.data.message || `Gagal mengambil laporan: ${err.response.status}`
+                      : "Koneksi ke server gagal. Pastikan server berjalan dan Anda login sebagai admin.";
       setError(message);
       setReports([]); 
       
@@ -61,7 +67,6 @@ function ReportPage() {
       </h1>
 
       <form onSubmit={handleFilterSubmit} className="mb-8 grid grid-cols-1 md:grid-cols-5 gap-4 items-end p-4 bg-gray-50 rounded-lg border"> 
-        
         <div className="md:col-span-2">
             <label className="block text-sm font-medium text-gray-700 mb-1">Cari Nama Pegawai</label>
             <input
@@ -72,7 +77,6 @@ function ReportPage() {
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" 
             />
         </div>
-
         <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Dari Tanggal</label>
             <input
@@ -82,7 +86,6 @@ function ReportPage() {
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
             />
         </div>
-
         <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Sampai Tanggal</label>
             <input
@@ -92,7 +95,6 @@ function ReportPage() {
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
             />
         </div>
-
         <button
           type="submit" 
           className="w-full py-2.5 bg-indigo-600 text-white font-semibold rounded-md shadow-md hover:bg-indigo-700 transition duration-200" 
@@ -105,23 +107,17 @@ function ReportPage() {
         <p className="text-red-700 bg-red-100 p-4 rounded-lg mb-6 font-medium border border-red-300">{error}</p> 
       )}
 
-=      {!error && ( 
+      {!error && ( 
         <div className="bg-white border rounded-lg overflow-x-auto"> 
           <table className="min-w-full divide-y divide-gray-200"> 
             <thead className="bg-gray-800 text-white"> 
               <tr> 
-                <th className="px-6 py-3 text-left text-sm font-semibold tracking-wider">
-                  Nama
-                </th>
-                <th className="px-6 py-3 text-left text-sm font-semibold tracking-wider">
-                  Check-In
-                </th>
-                <th className="px-6 py-3 text-left text-sm font-semibold tracking-wider">
-                  Check-Out
-                </th>
-                <th className="px-6 py-3 text-left text-sm font-semibold tracking-wider">
-                  Durasi
-                </th>
+                <th className="px-6 py-3 text-left text-sm font-semibold tracking-wider">Nama</th>
+                <th className="px-6 py-3 text-left text-sm font-semibold tracking-wider">Check-In</th>
+                <th className="px-6 py-3 text-left text-sm font-semibold tracking-wider">Check-Out</th>
+                <th className="px-6 py-3 text-left text-sm font-semibold tracking-wider">Durasi</th>
+                {/* 2. KOLOM BARU BUKTI FOTO */}
+                <th className="px-6 py-3 text-left text-sm font-semibold tracking-wider text-center">Bukti Foto</th>
               </tr> 
             </thead> 
             <tbody className="bg-white divide-y divide-gray-200"> 
@@ -148,12 +144,26 @@ function ReportPage() {
                             <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold">
                                 {durationHours !== '-' ? `${durationHours} jam` : '-'}
                             </td>
+                            
+                            {/* 3. TAMPILKAN THUMBNAIL FOTO */}
+                            <td className="px-6 py-4 whitespace-nowrap text-center">
+                                {presensi.buktiFoto ? (
+                                    <img 
+                                        src={`${BASE_URL}/${presensi.buktiFoto}`} 
+                                        alt="Bukti"
+                                        className="h-12 w-12 object-cover rounded-md cursor-pointer border hover:opacity-80 mx-auto shadow-sm"
+                                        onClick={() => setSelectedImage(`${BASE_URL}/${presensi.buktiFoto}`)}
+                                    />
+                                ) : (
+                                    <span className="text-gray-400 text-xs italic">Tidak ada</span>
+                                )}
+                            </td>
                         </tr>
                     );
                 }) 
               ) : (
                 <tr> 
-                  <td colSpan="4" className="px-6 py-8 text-center text-gray-500 italic"> 
+                  <td colSpan="5" className="px-6 py-8 text-center text-gray-500 italic"> 
                     Tidak ada data presensi yang ditemukan untuk kriteria ini.
                   </td>
                 </tr> 
@@ -162,6 +172,32 @@ function ReportPage() {
           </table> 
         </div> 
       )}
+
+      {/* 4. MODAL POPUP (Overlay dengan Tailwind) */}
+      {selectedImage && (
+        <div 
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75 p-4"
+            onClick={() => setSelectedImage(null)}
+        >
+            <div className="relative max-w-4xl w-full flex flex-col items-center">
+                {/* Tombol Close */}
+                <button 
+                    className="absolute -top-10 right-0 text-white text-3xl font-bold hover:text-gray-300 focus:outline-none"
+                    onClick={() => setSelectedImage(null)}
+                >
+                    &times;
+                </button>
+                
+                {/* Gambar Full Size */}
+                <img 
+                    src={selectedImage} 
+                    alt="Full Size" 
+                    className="max-h-[90vh] max-w-full rounded-lg shadow-2xl object-contain bg-white"
+                />
+            </div>
+        </div>
+      )}
+
     </div>
     </>
   ); 
